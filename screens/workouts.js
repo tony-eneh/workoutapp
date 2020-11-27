@@ -1,6 +1,6 @@
 import React from 'react';
 import {Text} from 'react-native';
 
-export default function workouts() {
-  return <Text>workouts Screen</Text>;
+export default function Workouts() {
+  return <Text>Workouts Screen</Text>;
 }

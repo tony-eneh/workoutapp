@@ -1,6 +1,6 @@
 import React from 'react';
 import {Text} from 'react-native';
 
-export default function settings() {
-  return <Text>settings Screen</Text>;
+export default function Settings() {
+  return <Text>Settings Screen</Text>;
 }
