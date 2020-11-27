@@ -8,7 +8,7 @@ import {createStackNavigator} from '@react-navigation/stack';
 const Stack = createStackNavigator();
 
 const AuthScreens = (
-  <Stack.Navigator>
+  <Stack.Navigator screenOptions={{headerShown: false}}>
     <Stack.Screen name="Welcome" component={Welcome} />
     <Stack.Screen name="Signup" component={Signup} />
     <Stack.Screen name="Login" component={Login} />
