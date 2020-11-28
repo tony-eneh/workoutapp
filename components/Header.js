@@ -44,6 +44,7 @@ const styles = StyleSheet.create({
   headerStyle: {
     height: 120,
     overflow: 'hidden',
+    marginBottom: 10,
   },
   appBar: {
     flexDirection: 'row',
