@@ -2,6 +2,7 @@ import React from 'react';
 import {StyleSheet, View} from 'react-native';
 import {FlatList} from 'react-native-gesture-handler';
 import Header from '../components/Header';
+import EmptyNotice from '../components/NoWorkoutYetNotice';
 import {Text, Button, Block} from 'galio-framework';
 import theme from '../constants/Theme';
 
@@ -58,23 +59,6 @@ export default function Workouts({navigation}) {
         />
       )}
     </>
-  );
-}
-
-// view to display if there's no workout data yet
-function EmptyNotice({navigation}) {
-  return (
-    <Block center style={{flex: 1, justifyContent: 'center'}}>
-      <Text p>Oops!! You don't have any workouts yet.</Text>
-      <Text p>Click the button below to start a workout now.</Text>
-      <Button
-        round
-        size="large"
-        color={theme.COLORS.BUTTON_COLOR}
-        onPress={() => navigation.navigate('WorkoutSession', {start: true})}>
-        START WORKOUT
-      </Button>
-    </Block>
   );
 }
 
