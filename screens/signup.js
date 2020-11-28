@@ -57,6 +57,8 @@ export default class Signup extends Component {
   }
   onSignupPress() {
     // perform some Signup task
+    // dispatch user data to global context
+    this.props.navigation.navigate('GoalSetting');
   }
 }
 

@@ -6,7 +6,7 @@ import {reducer} from './reducers';
 import AuthScreens from './navigation/AuthScreens';
 import UserScreens from './navigation/UserScreens';
 
-const AuthContext = React.createContext();
+export const AuthContext = React.createContext();
 
 export default function App({navigation}) {
   const [state, dispatch] = React.useReducer(reducer, {

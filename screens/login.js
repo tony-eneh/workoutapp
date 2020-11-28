@@ -12,10 +12,12 @@ import {
 } from 'react-native';
 import materialTheme from '../constants/Theme';
 import {Button} from 'galio-framework';
+import {AuthContext} from '../App';
 
 const {width} = Dimensions.get('screen');
 
 export default class Login extends Component {
+  static contextType = AuthContext;
   render() {
     return (
       <KeyboardAvoidingView style={styles.containerView} behavior="padding">
@@ -46,7 +48,11 @@ export default class Login extends Component {
     );
   }
   onLoginPress() {
-    // perform some login task
+    // dispatch an action to update user's goals
+    // set global loggedin content
+    const {signIn} = this.context;
+    console.log('signIn', signIn);
+    signIn();
   }
 }
 
