@@ -3,6 +3,7 @@ import Profile from '../screens/Profile';
 import Settings from '../screens/Settings';
 import Workouts from '../screens/Workouts';
 import AboutApp from '../screens/AboutApp';
+import WorkoutSession from '../screens/WorkoutSession';
 import React from 'react';
 import {createDrawerNavigator} from '@react-navigation/drawer';
 import materialTheme from '../constants/Theme';
@@ -50,6 +51,7 @@ const UserScreens = (
     <Drawer.Screen name="Profile" component={Profile} />
     <Drawer.Screen name="Settings" component={Settings} />
     <Drawer.Screen name="AboutApp" component={AboutApp} />
+    <Drawer.Screen name="WorkoutSession" component={WorkoutSession} />
   </Drawer.Navigator>
 );
 
