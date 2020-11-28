@@ -1,29 +1,37 @@
 import React from 'react';
-import {StyleSheet, View, Image} from 'react-native';
+import {StyleSheet, View, Image, TouchableOpacity} from 'react-native';
 import {Text, Block} from 'galio-framework';
 import MenuIcon from '../assets/MenuIcon.png';
 import Avatar from '../assets/Avatar.png';
 import Logo from '../assets/Logo.png';
 
-export default function Header({title}) {
+export default function Header({title, navigation}) {
   return (
     <View style={styles.headerStyle}>
       <View style={styles.appBar}>
-        <Image
-          source={MenuIcon}
-          style={[styles.normalizeImages, styles.menuIcon]}
-          resizeMode="contain"
-        />
+        <TouchableOpacity
+          style={styles.item}
+          onPress={() => navigation.openDrawer()}>
+          <Image
+            source={MenuIcon}
+            style={[styles.normalizeImages, styles.menuIcon]}
+            resizeMode="contain"
+          />
+        </TouchableOpacity>
         <Image
           source={Logo}
           style={[styles.normalizeImages, styles.logo]}
           resizeMode="contain"
         />
-        <Image
-          source={Avatar}
-          style={[styles.normalizeImages, styles.avatar]}
-          resizeMode="contain"
-        />
+        <TouchableOpacity
+          style={styles.item}
+          onPress={() => navigation.navigate('Profile')}>
+          <Image
+            source={Avatar}
+            style={[styles.normalizeImages, styles.avatar]}
+            resizeMode="contain"
+          />
+        </TouchableOpacity>
       </View>
       <Block center style={styles.titleArea}>
         <Text h4>{title}</Text>
@@ -36,7 +44,6 @@ const styles = StyleSheet.create({
   headerStyle: {
     height: 120,
     overflow: 'hidden',
-    backgroundColor: 'red',
   },
   appBar: {
     flexDirection: 'row',
@@ -50,6 +57,7 @@ const styles = StyleSheet.create({
   },
   titleArea: {
     color: 'yellow',
+    borderBottomWidth: 2,
   },
   menuIcon: {},
   avatar: {},
@@ -59,6 +67,8 @@ const styles = StyleSheet.create({
   normalizeImages: {
     width: undefined,
     height: '100%',
+  },
+  item: {
     flex: 1,
   },
 });
