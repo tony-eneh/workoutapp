@@ -30,6 +30,10 @@ export default function App({navigation}) {
 
       // This will switch to the App screen or Auth screen and this loading
       // screen will be unmounted and thrown away.
+
+      // manually set userToken so we can view user pages
+      // TODO: remove after development
+      userToken = 'dummy_user_token';
       dispatch({type: 'RESTORE_TOKEN', token: userToken});
     };
 
