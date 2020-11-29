@@ -66,7 +66,7 @@ export default function App({navigation}) {
   return (
     <NavigationContainer>
       <AuthContext.Provider value={authContext}>
-        {state.userToken == null ? AuthScreens : UserScreens}
+        {!state.userToken ? AuthScreens : UserScreens}
       </AuthContext.Provider>
     </NavigationContainer>
   );
