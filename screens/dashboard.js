@@ -1,5 +1,10 @@
 import React, {useEffect} from 'react';
-import {StyleSheet, PermissionsAndroid, Alert} from 'react-native';
+import {
+  StyleSheet,
+  PermissionsAndroid,
+  Alert,
+  DrawerLayoutAndroidComponent,
+} from 'react-native';
 import Header from '../components/Header';
 import EmptyNotice from '../components/NoWorkoutYetNotice';
 import {AnimatedCircularProgress} from 'react-native-circular-progress';
@@ -7,6 +12,7 @@ import {Text, Block, Button} from 'galio-framework';
 import theme from '../constants/Theme';
 import Avatar from '../assets/Avatar.png';
 import Geolocation from 'react-native-geolocation-service';
+import {getDistanceBetweenPoints, getTimeFromTimestamp} from '../utils';
 
 // static app states
 // TODO use redux to manage state
@@ -17,36 +23,64 @@ const profile = {
   email: 'tony.eneh@kmail.com',
 };
 
-// function to calculate distance between two geolocation points
-function getDistanceBetweenPoints(point1, point2) {
-  const {latitude: lat1, longitude: lon1} = point1;
-  const {latitude: lat2, longitude: lon2} = point2;
-  const R = 6371e3; // metres
-  const φ1 = (lat1 * Math.PI) / 180; // φ, λ in radians
-  const φ2 = (lat2 * Math.PI) / 180;
-  const Δφ = ((lat2 - lat1) * Math.PI) / 180;
-  const Δλ = ((lon2 - lon1) * Math.PI) / 180;
-  const a =
-    Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
-    Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-
-  return R * c; // distance in metres
+function getTimeFill(location, initialLocation, timeGoal) {
+  if (!location || !initialLocation) {
+    return 0;
+  }
+  const {timestamp: ts} = location;
+  const {timestamp: its} = initialLocation;
+  return (100 * (ts - its)) / timeGoal;
 }
 
 export default function Dashboard({navigation, route}) {
   const [isJogging, setJogging] = React.useState(false);
-  const [position, setPosition] = React.useState(null);
+  const [location, setLocation] = React.useState(null);
   const [error, setError] = React.useState(null);
   const [hasLocationPermission, setLocationPermission] = React.useState(false);
-  const [initialTime, setInitialTime] = React.useState(null);
+  const [initialTime, setInitialTime] = React.useState(0);
+  const [initialPoint, setInitialPoint] = React.useState(null);
+  const [lastPoint, setLastPoint] = React.useState(null);
+  const [distance, setDistance] = React.useState(0);
+  const [duration, setDuration] = React.useState(0);
+  const [distanceGoal, setDistanceGoal] = React.useState(10000); // in meters = 10km
+  const [durationGoal, setDurationGoal] = React.useState(60 * 60); // one hour
+  const [initialLocation, setInitialLocation] = React.useState(null);
+
+  const _setValues = ({timestamp, coords}) => {
+    if (!(timestamp || coords)) {
+      return;
+    }
+    if (initialPoint && lastPoint) {
+      setDistance(distance + getDistanceBetweenPoints(lastPoint, coords));
+    }
+    if (initialTime) {
+      setDuration(timestamp - initialTime);
+    }
+    // set initial values if not set
+    if (!initialTime) {
+      setInitialTime(timestamp);
+    }
+    if (!initialPoint) {
+      setInitialPoint(coords);
+    }
+    if (!lastPoint) {
+      setLastPoint(coords);
+    }
+  };
 
   useEffect(() =>
     console.log('state', {
       isJogging,
-      position,
+      location,
       error,
       hasLocationPermission,
+      initialTime,
+      initialPoint,
+      lastPoint,
+      distance,
+      duration,
+      distanceGoal,
+      durationGoal,
     }),
   );
 
@@ -78,6 +112,11 @@ export default function Dashboard({navigation, route}) {
       });
   }, []);
 
+  // get initial location and timestamp
+  React.useEffect(() => {
+    Geolocation.getCurrentPosition(setInitialLocation);
+  }, []);
+
   // start/stop geolocation position watching
   React.useEffect(() => {
     // check if geolocation permission has been granted
@@ -89,14 +128,9 @@ export default function Dashboard({navigation, route}) {
       let watchId = null;
       if (isJogging) {
         watchId = Geolocation.watchPosition(
-          ({timestamp, coords}) => {
-            // success callback
-            if (!initialTime) {
-              setInitialTime(timestamp);
-              setPosition(coords);
-            }
-          },
-          // error callback
+          // success
+          setLocation,
+          // error
           setError,
           {
             // options
@@ -113,13 +147,7 @@ export default function Dashboard({navigation, route}) {
         }
       }
     }
-  }, [isJogging, hasLocationPermission, initialTime]);
-
-  //  handle location change
-  useEffect(() => {
-    // Alert.alert('new position:' + position);
-    // Alert.alert('error ' + error);
-  }, [position, error]);
+  }, [isJogging, hasLocationPermission]);
 
   return (
     <>
@@ -139,37 +167,41 @@ export default function Dashboard({navigation, route}) {
             <AnimatedCircularProgress
               size={120}
               width={15}
-              fill={90}
+              fill={getTimeFill(location, initialLocation, durationGoal)}
               tintColor={theme.COLORS.ACTIVE}
               onAnimationComplete={() => console.log('onAnimationComplete')}
               backgroundColor={theme.COLORS.MUTED}
               rotation={0}
               children={(fill) => <Percent fill={fill} label={'TIME GOAL'} />}
             />
-            <Text>TOTAL JOGGING TIME {'2hrs 5mins'}</Text>
+            <Text>
+              TOTAL JOGGING TIME <FormattedTime duration={duration} />
+            </Text>
           </Block>
           <Block style={[styles.distanceBlock, styles.center]}>
             <AnimatedCircularProgress
               size={120}
               width={15}
-              fill={55}
+              fill={0}
               tintColor={theme.COLORS.ACTIVE}
               onAnimationComplete={() => console.log('onAnimationComplete')}
               backgroundColor={theme.COLORS.MUTED}
               rotation={0}
               children={(fill) => <Percent fill={fill} label={'TIME GOAL'} />}
             />
-            <Text>TOTAL DISTANCE COVERED {'14km'}</Text>
+            <Text>
+              TOTAL DISTANCE COVERED <FormattedDistance distance={distance} />
+            </Text>
           </Block>
           <Button
             size="large"
             color={theme.COLORS.BUTTON_COLOR}
             onPress={() => {
-              setJogging(true);
-              console.log('set jogging to true');
+              setJogging(!isJogging);
+              console.log('set jogging');
               // Alert.alert('just clicked set jogging button');
             }}>
-            START JOGGING
+            {!isJogging ? 'START JOGGING' : 'STOP JOGGING'}
           </Button>
         </Block>
       )}
@@ -180,9 +212,38 @@ export default function Dashboard({navigation, route}) {
 function Percent({fill, label}) {
   return (
     <Block center>
-      <Text h5>{fill}%</Text>
+      <Text h5>{Math.floor(fill)}%</Text>
       <Text>{label}</Text>
     </Block>
+  );
+}
+
+function FormattedTime({duration}) {
+  const {hours, minutes, seconds} = getTimeFromTimestamp(duration);
+
+  // if there's hours return only hours and minutes. If not return minutes and seconds
+  if (hours) {
+    return (
+      <Text>
+        {hours} hrs, {minutes} mins
+      </Text>
+    );
+  } else {
+    return (
+      <Text>
+        {minutes} mins, {seconds} secs
+      </Text>
+    );
+  }
+}
+
+function FormattedDistance({distance}) {
+  const m = distance % 1000;
+  const km = (distance - m) / 1000;
+  return (
+    <Text>
+      {km} km, {Math.floor(m)} meters
+    </Text>
   );
 }
 
