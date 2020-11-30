@@ -32,6 +32,24 @@ function getTimeFill(location, initialLocation, timeGoal) {
   return (100 * (ts - its)) / timeGoal;
 }
 
+function getDistanceFill({
+  location,
+  lastLocation,
+  initiallocation,
+  distance,
+  distanceGoal,
+}) {
+  if (!location || !lastLocation) {
+    return 0;
+  }
+  const incrementalDistance = getDistanceBetweenPoints(
+    lastLocation.coords,
+    location.coords,
+  );
+
+  return distance + incrementalDistance;
+}
+
 export default function Dashboard({navigation, route}) {
   const [isJogging, setJogging] = React.useState(false);
   const [location, setLocation] = React.useState(null);
