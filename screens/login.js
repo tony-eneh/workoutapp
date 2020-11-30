@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import materialTheme from '../constants/Theme';
 import {Button} from 'galio-framework';
-import {AuthContext} from '../App';
+import AuthContext from '../store/AuthContext';
 
 const {width} = Dimensions.get('screen');
 

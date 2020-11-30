@@ -5,8 +5,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import {reducer} from './reducers';
 import AuthScreens from './navigation/AuthScreens';
 import UserScreens from './navigation/UserScreens';
-
-export const AuthContext = React.createContext();
+import AuthContext from './store/AuthContext';
 
 export default function App({navigation}) {
   const [state, dispatch] = React.useReducer(reducer, {
@@ -33,7 +32,7 @@ export default function App({navigation}) {
 
       // manually set userToken so we can view user pages
       // TODO: remove after development
-      userToken = 'dummy_user_token';
+      // userToken = 'dummy_user_token';
       dispatch({type: 'RESTORE_TOKEN', token: userToken});
     };
 

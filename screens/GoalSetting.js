@@ -15,7 +15,7 @@ import materialTheme from '../constants/Theme';
 import {Button} from 'galio-framework';
 import ImagePicker from 'react-native-image-picker';
 import {Avatar} from '../constants/Images';
-import {AuthContext} from '../App';
+import AuthContext from '../store/AuthContext';
 
 const {width} = Dimensions.get('screen');
 
